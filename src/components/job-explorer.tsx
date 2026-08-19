@@ -192,19 +192,21 @@ export default function JobExplorer({ query, jobs }: JobExplorerProps) {
         <div className="flex items-center justify-between gap-2 border-b border-border bg-muted px-4 py-3">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() => setSidebarHidden((v) => !v)}
-                >
-                  {sidebarHidden ? (
-                    <PanelLeftOpen className="size-4" />
-                  ) : (
-                    <RectangleHorizontal className="size-4" />
-                  )}
-                </Button>
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    onClick={() => setSidebarHidden((v) => !v)}
+                  >
+                    {sidebarHidden ? (
+                      <PanelLeftOpen className="size-4" />
+                    ) : (
+                      <RectangleHorizontal className="size-4" />
+                    )}
+                  </Button>
+                }
+              />
               <TooltipContent>
                 {sidebarHidden ? "Tampilkan sidebar" : "Landscape view"}
               </TooltipContent>
