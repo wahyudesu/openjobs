@@ -8,6 +8,21 @@ const CACHE_TTL = 60 * 60 * 1000;
 
 const cache = new Map<string, { html: string; at: number }>();
 
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("timeout")), ms);
+    promise
+      .then((v) => {
+        clearTimeout(timer);
+        resolve(v);
+      })
+      .catch((e) => {
+        clearTimeout(timer);
+        reject(e);
+      });
+  });
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const url = requestUrl.searchParams.get("url");
@@ -37,14 +52,12 @@ export async function GET(request: Request) {
     });
   }
 
-  const page = await newPage();
   try {
-    await navigate(page, url);
-
-    const rawHtml = await page.content();
-    const html = sanitizeProxiedHtml(rawHtml, target, proxyOrigin);
+    const html = await withTimeout(
+      renderPage(url, target, proxyOrigin),
+      12_000,
+    );
     cache.set(url, { html, at: Date.now() });
-
     return new Response(html, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
@@ -56,6 +69,16 @@ export async function GET(request: Request) {
     return new Response(proxyErrorPage(url, proxyOrigin), {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
+  }
+}
+
+async function renderPage(url: string, target: URL, proxyOrigin: string) {
+  const page = await newPage();
+  try {
+    await navigate(page, url);
+
+    const rawHtml = await page.content();
+    return sanitizeProxiedHtml(rawHtml, target, proxyOrigin);
   } finally {
     await page
       .context()

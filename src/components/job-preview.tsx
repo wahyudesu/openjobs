@@ -65,6 +65,12 @@ export default function JobPreview({ job }: JobPreviewProps) {
     return () => clearTimeout(timer);
   }, [mode, loaded]);
 
+  useEffect(() => {
+    if (mode !== "proxy" || loaded || failed) return;
+    const timer = setTimeout(() => setFailed(true), 15_000);
+    return () => clearTimeout(timer);
+  }, [mode, loaded, failed]);
+
   const retryButton = (
     <button
       type="button"
@@ -117,6 +123,7 @@ export default function JobPreview({ job }: JobPreviewProps) {
             title={job.title}
             sandbox={IFRAME_SANDBOX}
             onLoad={() => setLoaded(true)}
+            onError={() => setMode("proxy")}
             className="h-full w-full border-0 bg-white"
           />
           {!loaded && (

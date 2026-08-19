@@ -21,7 +21,7 @@ async function getBrowser(): Promise<Browser> {
   if (!connecting) {
     connecting = chromium
       .connectOverCDP(browserWsEndpoint(), {
-        timeout: 55_000,
+        timeout: 10_000,
         headers: {
           Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
         },
