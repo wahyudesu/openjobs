@@ -35,5 +35,19 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/components/ui/**"],
+      "javascript": {
+        "formatter": {
+          "quoteStyle": "single",
+          "semicolons": "asNeeded"
+        }
+      },
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
 }
