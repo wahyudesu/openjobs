@@ -230,6 +230,7 @@ export default function JobExplorer({ query, jobs }: JobExplorerProps) {
               variant="outline"
               size="sm"
               disabled={!selected}
+              nativeButton={false}
               render={selected ? <a href={selected.url} target="_blank" rel="noopener noreferrer" /> : <span />}
             >
               <ExternalLink className="size-3.5" />
@@ -274,7 +275,7 @@ export default function JobExplorer({ query, jobs }: JobExplorerProps) {
             <Button variant="outline" onClick={() => setLoginPrompt(false)}>
               Batal
             </Button>
-            <Button render={<Link href="/login" />}>
+            <Button nativeButton={false} render={<Link href="/login" />}>
               Login
             </Button>
           </DialogFooter>

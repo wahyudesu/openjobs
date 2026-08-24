@@ -11,11 +11,11 @@ export default function Header() {
         openjobs
       </Link>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" render={<Link href="/directory" />}>
+        <Button variant="ghost" nativeButton={false} render={<Link href="/directory" />}>
           Directory
         </Button>
         <ModeToggle />
-        <Button variant="default" render={<Link href="/login" />}>
+        <Button variant="default" nativeButton={false} render={<Link href="/login" />}>
           Login
         </Button>
       </div>
