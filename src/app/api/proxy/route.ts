@@ -1,10 +1,8 @@
-import { navigate, newPage, warmup } from "@/lib/browser";
+import { navigate, newPage } from "@/lib/browser";
 import { proxyErrorPage, sanitizeProxiedHtml } from "@/lib/proxy-html";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
-
-warmup();
 
 const CACHE_TTL = 60 * 60 * 1000;
 
@@ -82,6 +80,9 @@ async function renderPage(url: string, target: URL, proxyOrigin: string) {
     const rawHtml = await page.content();
     return sanitizeProxiedHtml(rawHtml, target, proxyOrigin);
   } finally {
-    await page.close().catch(() => {});
+    await page
+      .context()
+      .close()
+      .catch(() => {});
   }
 }
