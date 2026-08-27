@@ -6,6 +6,7 @@ export const BROWSER_UA =
 
 let browser: Browser | null = null;
 let connecting: Promise<Browser> | null = null;
+let sharedContext: Awaited<ReturnType<Browser["newContext"]>> | null = null;
 
 function browserWsEndpoint(): string {
   if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) {
@@ -37,22 +38,32 @@ async function getBrowser(): Promise<Browser> {
   return connecting;
 }
 
-export async function newPage(): Promise<Page> {
+async function getContext() {
   const b = await getBrowser();
-  const context = await b.newContext({
+  if (sharedContext) return sharedContext;
+  sharedContext = await b.newContext({
     locale: "id-ID",
     userAgent: BROWSER_UA,
   });
-  await context.addInitScript(() => {
+  await sharedContext.addInitScript(() => {
     Object.defineProperty(navigator, "webdriver", { get: () => undefined });
   });
-  return context.newPage();
+  return sharedContext;
+}
+
+export async function warmup(): Promise<void> {
+  try {
+    await getContext();
+  } catch {
+    // abaikan error saat warmup
+  }
+}
+
+export async function newPage(): Promise<Page> {
+  const ctx = await getContext();
+  return ctx.newPage();
 }
 
 export async function navigate(page: Page, url: string): Promise<void> {
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20_000 });
-  await page
-    .waitForLoadState("networkidle", { timeout: 1_500 })
-    .catch(() => {});
-  await page.waitForTimeout(500);
+  await page.goto(url, { waitUntil: "load", timeout: 20_000 });
 }

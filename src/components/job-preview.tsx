@@ -4,7 +4,6 @@ import { ExternalLink, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { DotmTriangle7 } from "@/components/ui/dotm-triangle-7";
-import { canIframe } from "@/lib/iframe";
 import type { Job } from "@/lib/jobs";
 
 const IFRAME_SANDBOX =
@@ -23,18 +22,10 @@ export default function JobPreview({ job }: JobPreviewProps) {
   const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    setMode("checking");
     setLoaded(false);
     setFailed(false);
-
-    let cancelled = false;
-    canIframe(job.url).then((allowed) => {
-      if (!cancelled) setMode(allowed ? "iframe" : "proxy");
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [job.url]);
+    setMode(job.mode);
+  }, [job.url, job.mode]);
 
   useEffect(() => {
     let link: HTMLLinkElement | null = null;
@@ -61,7 +52,7 @@ export default function JobPreview({ job }: JobPreviewProps) {
     const timer = setTimeout(() => {
       setLoaded(false);
       setMode("proxy");
-    }, 12_000);
+    }, 5_000);
     return () => clearTimeout(timer);
   }, [mode, loaded]);
 

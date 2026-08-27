@@ -42,9 +42,6 @@ export async function GET(request: Request) {
       { status: 502 },
     );
   } finally {
-    await page
-      .context()
-      .close()
-      .catch(() => {});
+    await page.close().catch(() => {});
   }
 }
